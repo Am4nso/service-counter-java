@@ -11,21 +11,22 @@ import servicecounter.Service;
  * @author USER
  */
 public class Consultation extends Service{
-
-    final private static double rateInMinute = 50;
     
-    private double consultDuration = 30;
+    private double consultDuration;
     private String topic;
-    
-    @Override
-    public void endService() {
-        addRevenue(rateInMinute*consultDuration);
-    }
-    
-    public void endService(double specialRate) {
-        addRevenue(rateInMinute*specialRate);
+
+    public Consultation() {
+        super("consultation");
+        topic = "";
+        consultDuration = 0;
     }
 
+    public Consultation(String topic, double consultDuration, int id) {
+        super(id, "consultation");
+        this.consultDuration = consultDuration;
+        this.topic = topic;
+    }
+    
     @Override
     public double getAverageETA() {
         return consultDuration;
@@ -43,5 +44,13 @@ public class Consultation extends Service{
         this.topic = topic;
     }
     
+    @Override
+    public boolean hasAnsweredQuestions(){
+        return !topic.equals("");
+    }
     
+    @Override 
+    public String toString() {
+        return getId() + ":repair:" + topic + ":" + consultDuration;
+    }
 }

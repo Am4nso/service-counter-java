@@ -4,6 +4,7 @@
  */
 package servicecounter.services;
 
+import java.io.IOException;
 import servicecounter.Service;
 
 /**
@@ -15,6 +16,20 @@ public class Repair extends Service{
     private String device;
     private String damage;
     private double repairDuration;
+    
+    public Repair() {
+        super("repair");
+        device = "";
+        damage = "";
+        repairDuration = 30; // default
+    }
+
+    public Repair(String device, String damage, double repairDuration, int id) {
+        super(id, "repair");
+        this.device = device;
+        this.damage = damage;
+        this.repairDuration = repairDuration;
+    }
 
     public String getDevice() {
         return device;
@@ -32,7 +47,6 @@ public class Repair extends Service{
         this.damage = damage;
     }
     
-    
     @Override
     public double getAverageETA() {
         return repairDuration;
@@ -40,5 +54,15 @@ public class Repair extends Service{
 
     public void setRepairDuration(double repairDuration) {
         this.repairDuration = repairDuration;
+    }
+    
+    @Override
+    public boolean hasAnsweredQuestions(){
+        return !(device.equals("") && damage.equals(""));
+    }
+    
+    @Override 
+    public String toString() {
+        return getId() + ":repair:" + device + ":" + damage + ":" + repairDuration;
     }
 }

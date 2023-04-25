@@ -5,9 +5,9 @@
 package servicecounter.gui;
 
 import javax.swing.JOptionPane;
-import servicecounter.Customer;
-import servicecounter.Employee;
-import servicecounter.Person;
+import servicecounter.person.Customer;
+import servicecounter.person.Employee;
+import servicecounter.person.Person;
 
 /**
  *
@@ -193,6 +193,11 @@ public class RegisterGUI extends javax.swing.JFrame {
         String password = new String(jPasswordField1.getPassword());
         String phoneNumber = jTextField2.getText();
         String appType = null;
+        Object gender = jComboBox1.getSelectedItem();
+        
+        if (gender == null || gender.equals("Rather not say")) {
+            gender = "";
+        }
         
         if (jRadioButton1.isSelected()) {
             appType = "customer";
@@ -211,7 +216,12 @@ public class RegisterGUI extends javax.swing.JFrame {
         
         switch (appType) {
             case "customer":
-                p = new Customer(username, password, name, name, Integer.parseInt(phoneNumber));
+                if (!Customer.usernameAvailability(username)) {
+                    JOptionPane.showMessageDialog(this, "Username is taken.");
+                    return;
+                }
+                
+                p = new Customer(username, password, name, (String) gender, Integer.parseInt(phoneNumber));
                 
                 CustomerGUI cgui = new CustomerGUI();
                 cgui.setCustomer((Customer) p);
@@ -221,7 +231,12 @@ public class RegisterGUI extends javax.swing.JFrame {
                 break;
             
             case "employee" :
-                p = new Employee(username, password, name, name, Integer.parseInt(phoneNumber), 0);
+                if (!Employee.usernameAvailability(username)) {
+                    JOptionPane.showMessageDialog(this, "Username is taken.");
+                    return;
+                }
+                
+                p = new Employee(username, password, name, (String) gender, Integer.parseInt(phoneNumber), 0);
                 
                 EmployeeGUI egui = new EmployeeGUI();
                 egui.setEmployee((Employee) p);

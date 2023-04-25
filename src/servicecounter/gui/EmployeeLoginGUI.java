@@ -4,6 +4,10 @@
  */
 package servicecounter.gui;
 
+import java.awt.Color;
+import javax.swing.JOptionPane;
+import servicecounter.person.Employee;
+
 /**
  *
  * @author USER
@@ -61,6 +65,11 @@ public class EmployeeLoginGUI extends javax.swing.JFrame {
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 130, -1, -1));
 
         jButton1.setText("Apply");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 330, -1, -1));
 
         jLabel6.setText("Want to apply for a job?");
@@ -68,9 +77,19 @@ public class EmployeeLoginGUI extends javax.swing.JFrame {
 
         jTextField1.setForeground(new java.awt.Color(153, 153, 153));
         jTextField1.setText("Username");
+        jTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTextField1FocusGained(evt);
+            }
+        });
         getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 160, 230, -1));
 
-        jPasswordField1.setText("jPasswordField1");
+        jPasswordField1.setText("Password");
+        jPasswordField1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jPasswordField1FocusGained(evt);
+            }
+        });
         getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 210, 230, -1));
 
         jButton2.setText("Login");
@@ -85,11 +104,41 @@ public class EmployeeLoginGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        String username = jTextField1.getText();
+         String username = jTextField1.getText();
         char[] password = jPasswordField1.getPassword();
         
+        Employee employee = Employee.login(username, password);
         
+        if (employee == null) {
+            JOptionPane.showMessageDialog(this, "Incorrect username or password.");
+            return;
+        }
+        
+        EmployeeGUI cgui = new EmployeeGUI();
+        cgui.setEmployee(employee);
+        cgui.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        RegisterGUI gui = new RegisterGUI();
+        gui.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusGained
+        if (jTextField1.getText().equals("Username")) {
+            jTextField1.setText("");
+            jTextField1.setForeground(Color.BLACK);
+        }
+    }//GEN-LAST:event_jTextField1FocusGained
+
+    private void jPasswordField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jPasswordField1FocusGained
+        if (new String(jPasswordField1.getPassword()).equals("Password")) {
+            jPasswordField1.setText("");
+            jPasswordField1.setForeground(Color.BLACK);
+        }
+    }//GEN-LAST:event_jPasswordField1FocusGained
 
     /**
      * @param args the command line arguments

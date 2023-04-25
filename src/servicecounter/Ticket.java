@@ -5,37 +5,27 @@
 package servicecounter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import servicecounter.person.Employee;
 
 /**
  *
  * @author USER
  */
 public class Ticket {
-    
-    private int ticketNumber;
     private ServiceQueue queue;
     private Service service;
+    private boolean compelete;
     
-    private static HashMap<String, Ticket> allTickets = new HashMap<>();
-    private static int nextNumber = 1;
-    
-    // ticketNumber:service:queueType
-    private static DataStorage storage = new DataStorage("ticket");
-    
-    static {
-        Scanner s = storage.getFile();
-        while (s.hasNextLine()) {
-            String[] data = s.nextLine().split(":");
-            
-            int ticketNumber = Integer.parseInt(data[0]);
-            service
-        }
-    }
+    private Employee serviceEmployee;
 
-    public int getTicketNumber() {
-        return ticketNumber;
+    private static ArrayList<Ticket> tickets = new ArrayList<>();
+
+    public Ticket(ServiceQueue queue, Service service) {
+        this.queue = queue;
+        this.service = service;
+        this.compelete = false;
+        
+        tickets.add(this);
     }
     
     public Service getService() {
@@ -46,6 +36,14 @@ public class Ticket {
         this.service = service;
     }
 
+    public boolean isCompelete() {
+        return compelete;
+    }
+    
+    public void makeComplete() {
+        compelete = true;
+    }
+
     public ServiceQueue getQueue() {
         return queue;
     }
@@ -54,8 +52,15 @@ public class Ticket {
         this.queue = queue;
     }
 
-    public static HashMap<String, Ticket> getAllTickets() {
-        return allTickets;
-    }    
+    public Employee getServiceEmployee() {
+        return serviceEmployee;
+    }
+
+    public void setServiceEmployee(Employee serviceEmployee) {
+        this.serviceEmployee = serviceEmployee;
+    }
+    
+    
+    
     
 }

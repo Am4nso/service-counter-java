@@ -4,8 +4,11 @@
  */
 package servicecounter;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import servicecounter.person.Customer;
 import java.util.Queue;
+import java.util.UUID;
 
 /**
  *
@@ -14,10 +17,37 @@ import java.util.Queue;
 public class ServiceQueue {
     
     // Last element means last in queue
-    private Queue<Customer> line;
-    private Ticket currentTicket;
+    private String Id;
+    private LinkedList<Customer> line;
     
-    private static HashMap<String, ServiceQueue> allQueues;
+    private static ArrayList<ServiceQueue> allQueues = new ArrayList<>();
+
+    public ServiceQueue() {
+        this.Id = UUID.randomUUID().toString();
+        line = new LinkedList<>();
+        
+        System.out.println("Added " + Id);
+        
+        allQueues.add(this);
+        
+        System.out.println(findBestQueue().getId());
+    }
+    
+    public static ServiceQueue findBestQueue() {
+        ServiceQueue best = null;
+        for (ServiceQueue queue : allQueues) {
+            System.out.println(queue.getId());
+            if (best == null || best.getLine().size() > queue.getLine().size()) {
+                best = queue;
+            }
+        }
+        return best;
+    }
+    
+
+    public String getId() {
+        return Id;
+    }
     
     public boolean addToQueue(Customer customer) {
         if (line.contains(customer)) {
@@ -41,5 +71,11 @@ public class ServiceQueue {
         }
         return totalTime;
     }
+
+    public Queue<Customer> getLine() {
+        return line;
+    }
+    
+    
     
 }

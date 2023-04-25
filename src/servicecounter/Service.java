@@ -4,6 +4,11 @@
  */
 package servicecounter;
 
+import java.util.ArrayList;
+import java.util.Scanner;
+import servicecounter.services.Consultation;
+import servicecounter.services.Repair;
+
 
 /**
  *
@@ -11,12 +16,28 @@ package servicecounter;
  */
 public class Service {
     
-    
-    private String type;
-    
-    private static int defaultPrice = 3500;
-    private static double totalRevenue = 0;
+    final private int id;
+    final private String type;
 
+    private static int nextId = 1;
+    
+    
+    public Service(String type) {
+        this.id = nextId;
+        this.type = type;
+        nextId++;
+    }
+    
+    // old ticket
+    public Service(int id, String type) {
+        this.id = id;
+        this.type = type;
+    }
+
+    public int getId() {
+        return id;
+    }
+    
     public String getType() {
         return type;
     }
@@ -24,16 +45,14 @@ public class Service {
     public double getAverageETA() {
         return 0;
     }
-
-    public static double getTotalRevenue() {
-        return totalRevenue;
-    }
-
-    public static void addRevenue(double revenue) {
-        totalRevenue+=revenue;
+    
+    public boolean hasAnsweredQuestions() {
+        return true;
     }
     
-    public void endService() {
-        addRevenue(defaultPrice);
+    // id:type
+    @Override 
+    public String toString() {
+        return id + ":" + type;
     }
 }

@@ -8,11 +8,15 @@ import java.awt.Color;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JOptionPane;
-import servicecounter.Customer;
+import javax.swing.JPopupMenu;
+import servicecounter.Rating;
+import servicecounter.person.Customer;
 import servicecounter.Service;
+import servicecounter.ServiceQueue;
 import servicecounter.Ticket;
 import servicecounter.services.Consultation;
 import servicecounter.services.Repair;
+import servicecounter.person.Employee;
 
 /**
  *
@@ -21,40 +25,68 @@ import servicecounter.services.Repair;
 public class CustomerGUI extends javax.swing.JFrame {
     
     private Customer customer;
+    private Timer timer;
     
     public void setCustomer(Customer c) {
         this.customer = c;
-        this.customer.setAvailable(true);
+        
         jLabel1.setText("Welcome back, " + customer.getName() + "!");
         jTextField2.setText(customer.getName());
         jTextField5.setText(customer.getGender());
         jTextField1.setText("$" + customer.getBalance());
         jTextField3.setText(String.valueOf(customer.getPhoneNumber()));
         
-        if (customer.getTicket() != null) {
-            jTabbedPane2.setSelectedIndex(1);
-            
-            Ticket ticket = customer.getTicket();
-            
-            String eta = String.valueOf(ticket.getQueue().getEstimatedTime(c));
-            
-            Timer timer = new Timer();
-            
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    jTextField6.setText(eta + " minutes"); 
-                }
-            }, 1000);
-            
-            if (ticket.getService() instanceof Consultation) {
-                jTabbedPane4.setSelectedIndex(0);
-            } else {
-                jTabbedPane4.setSelectedIndex(1);
-            }
-        }
+        
     }
     
+    public void showRepairScreen() {
+        jTabbedPane2.setSelectedIndex(1);
+        jTabbedPane4.setSelectedIndex(1);
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (customer.getTicket().isCompelete()) {
+                        showRateMenu();
+                        return;
+                    }
+                    String eta = String.valueOf(customer.getTicket().getQueue().getEstimatedTime(customer));
+                    jTextField6.setText(eta + " minutes");
+                }
+            }, 1000, 1000);
+    }
+    
+    public void showConsultationScreen() {
+        jTabbedPane2.setSelectedIndex(1);
+        jTabbedPane4.setSelectedIndex(0);
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    jTextField1.setText("$" + customer.getBalance());
+                    if (customer.getTicket().isCompelete()) {
+                        showRateMenu();
+                        return;
+                    }
+                    String eta = String.valueOf(customer.getTicket().getQueue().getEstimatedTime(customer));
+                    jTextField6.setText(eta + " minutes"); 
+                }
+            }, 1000, 1000);
+    }
+    
+    public void showRateMenu() {
+        Employee e = customer.getTicket().getServiceEmployee();
+        
+        if (e == null) {
+            return;
+        }
+        
+        jTabbedPane2.setSelectedIndex(0);
+        jLabel16.setVisible(false);
+        jPanel6.setVisible(true);
+        jTextField4.setText(e.getName());
+
+    }
 
     /**
      * Creates new form CustomerGUI
@@ -80,7 +112,6 @@ public class CustomerGUI extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
@@ -89,6 +120,8 @@ public class CustomerGUI extends javax.swing.JFrame {
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel9 = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
+        jButton7 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
         jPanel8 = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
@@ -173,10 +206,6 @@ public class CustomerGUI extends javax.swing.JFrame {
         });
         getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 340, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
-        jLabel2.setText("Status: You are currently not in line.");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 352, 193, -1));
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -190,7 +219,6 @@ public class CustomerGUI extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 50));
 
-        jPanel2.setMaximumSize(new java.awt.Dimension(32767, 32767));
         jPanel2.setMinimumSize(new java.awt.Dimension(0, 0));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -213,20 +241,43 @@ public class CustomerGUI extends javax.swing.JFrame {
 
         jLabel17.setText("Choose a service");
 
+        jButton7.setText("Repair");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
+        jButton9.setText("Consultation");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
-                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 614, Short.MAX_VALUE))
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 286, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel17)
-                .addContainerGap(237, Short.MAX_VALUE))
+                .addGap(37, 37, 37)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton7)
+                    .addComponent(jButton9))
+                .addContainerGap(177, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("tab2", jPanel9);
@@ -261,7 +312,7 @@ public class CustomerGUI extends javax.swing.JFrame {
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 435, Short.MAX_VALUE))
+                .addGap(0, 445, Short.MAX_VALUE))
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -273,7 +324,7 @@ public class CustomerGUI extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel8.add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 700, 50));
+        jPanel8.add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 710, 50));
         jPanel8.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 133, -1, 20));
 
         jLabel23.setText("What is the topic of the service?");
@@ -359,7 +410,6 @@ public class CustomerGUI extends javax.swing.JFrame {
 
         jLabel16.setText("You must first use our service to rate an employee.");
 
-        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
@@ -406,12 +456,13 @@ public class CustomerGUI extends javax.swing.JFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGap(17, 17, 17)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel12)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel13)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel12)))
                 .addGap(26, 26, 26)
                 .addComponent(jLabel14)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -601,13 +652,14 @@ public class CustomerGUI extends javax.swing.JFrame {
     // Answer button
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         Service service = customer.getTicket().getService();
-        if (service instanceof Consultation) {
+        if (service.getType().equals("consultation")) {
+            System.out.println("12321321321321fdsfsdfdsfdsfsdfdsfsdf");
             if (jTextField7.getText().equals("")) {
                 JOptionPane.showMessageDialog(this, "You must answer the question.");
                 return;
             }
             ((Consultation) service).setTopic(jTextField7.getText());
-        } else if (service instanceof Repair){
+        } else if (service.getType().equals("repair")){
             if (jTextField8.getText().equals("") || jTextField9.getText().equals("")) {
                 JOptionPane.showMessageDialog(this, "You must answer the question.");
                 return;
@@ -615,12 +667,21 @@ public class CustomerGUI extends javax.swing.JFrame {
             ((Repair) service).setDevice(jTextField8.getText());
             ((Repair) service).setDamage(jTextField9.getText());
         }
-        jButton8.setEnabled(rootPaneCheckingEnabled);
+        jButton8.setEnabled(false);
     }//GEN-LAST:event_jButton8ActionPerformed
 
     // Rate submit button
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
+        int score = jComboBox1.getSelectedIndex() + 1;
+        String message = jTextArea1.getText();
+        
+        Rating.postRating(score, message, customer.getTicket().getServiceEmployee());
+        
+        customer.getTicket().setServiceEmployee(null);
+        
+        jPanel6.setVisible(false);
+        
+        JOptionPane.showMessageDialog(this, "Your rating was added successfully.");
     }//GEN-LAST:event_jButton5ActionPerformed
 
     // Save phone number button
@@ -661,6 +722,47 @@ public class CustomerGUI extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, "You have deposited money to your account sucessfully.");
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        ServiceQueue leastBusyQueue = ServiceQueue.findBestQueue();
+        
+        if (leastBusyQueue == null) {
+            JOptionPane.showMessageDialog(this, "There are no open counters at the moment.");
+            return;
+        }
+        
+        leastBusyQueue.addToQueue(customer);
+        
+        Repair service = new Repair();
+        
+        Ticket ticket = new Ticket(leastBusyQueue, service);
+        
+        customer.setTicket(ticket);
+        
+        showRepairScreen();
+        jLabel19.setText("Repair");
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        ServiceQueue leastBusyQueue = ServiceQueue.findBestQueue();
+        
+        if (leastBusyQueue == null) {
+            JOptionPane.showMessageDialog(this, "There are no open counters at the moment.");
+            return;
+        }
+        
+        leastBusyQueue.addToQueue(customer);
+        
+        Consultation service = new Consultation();
+        
+        Ticket ticket = new Ticket(leastBusyQueue, service);
+        
+        customer.setTicket(ticket);
+        
+        showConsultationScreen();
+        jLabel19.setText("Consultation");
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    
     
     /**
      * @param args the command line arguments
@@ -704,7 +806,9 @@ public class CustomerGUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -717,7 +821,6 @@ public class CustomerGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
